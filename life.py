@@ -17,10 +17,10 @@ class Field:
                 if self.field[x][y]:
                     pygame.draw.rect(self.screen, pygame.Color('red'),
                                      (x * self.cell_size + self.left, y * self.cell_size + self.top,
-                                      self.cell_size + self.left, self.cell_size + self.top), )
+                                      self.cell_size, self.cell_size), 0)
                 pygame.draw.rect(self.screen, pygame.Color('white'),
                                  (x * self.cell_size + self.left, y * self.cell_size + self.top,
-                                  self.cell_size + self.left, self.cell_size + self.top), 1)
+                                  self.cell_size, self.cell_size), 1)
 
     def on_click(self, cell):
         y, x = cell
