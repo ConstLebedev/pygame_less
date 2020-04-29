@@ -40,10 +40,10 @@ class Field:
 
 if __name__ == '__main__':
     pygame.init()
-    size = 300, 300
+    size = 320, 320
     screen = pygame.display.set_mode(size)
 
-    board = Field(screen, 10, 10)
+    board = Field(screen, 10, 10, 10, 10)
 
     running = True
     while running:
