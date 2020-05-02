@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 
 class Field:
@@ -38,23 +39,67 @@ class Field:
             self.on_click(cell)
 
 
+class Life(Field):
+    def __init__(self, screen, rows, cols, left=0, top=0, cell_size=30):
+        super().__init__(screen, rows, cols, left, top, cell_size)
+        self.field = np.zeros((rows, cols), dtype=np.uint8)
+
+    def next_population(self):
+        neighbors = sum([
+            np.roll(np.roll(self.field, -1, 1), 1, 0),
+            np.roll(np.roll(self.field, 1, 1), -1, 0),
+            np.roll(np.roll(self.field, 1, 1), 1, 0),
+            np.roll(np.roll(self.field, -1, 1), -1, 0),
+            np.roll(self.field, 1, 1),
+            np.roll(self.field, -1, 1),
+            np.roll(self.field, 1, 0),
+            np.roll(self.field, -1, 0)
+        ])
+        self.field = (neighbors == 3) | (self.field & (neighbors == 2))
+
+
 if __name__ == '__main__':
     pygame.init()
-    size = 320, 320
+    size = 620, 630
     screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
 
-    board = Field(screen, 10, 10, 10, 10)
+    board = Life(screen, 30, 30, 10, 20, 20)
 
+    fps = 100
+    font = pygame.font.Font(None, 18)
+    text = font.render(str(fps), 1, (255, 0, 0))
+
+    time_on = False
     running = True
+    delay = 100
+    ticks = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 board.get_click(event.pos)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                time_on = not time_on
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
+                delay = min(100, delay + 1)
+                text = font.render(str(delay), 1, (255, 0, 0))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
+                delay = max(1, delay - 1)
+                text = font.render(str(delay), 1, (255, 0, 0))
 
         screen.fill((0, 0, 0))
+        screen.blit(text, (size[0] - 30, 5))
         board.render()
+
+        if ticks >= delay:
+            if time_on:
+                board.next_population()
+            ticks = 0
+
         pygame.display.flip()
+        clock.tick(fps)
+        ticks += 1
 
     pygame.quit()
